@@ -44,4 +44,4 @@ function loadFromStorage(key) {
     } catch (err) { 
         console.log("Some problem: ", err.message)
     }
-}
+};
