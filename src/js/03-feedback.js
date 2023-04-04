@@ -1,26 +1,32 @@
 import { throttle } from "lodash";
 
 // Ключ для сховища буде рядок "feedback-form-state"
-const KEY_DATA_STORAGE = "feedback-form-state"
+const KEY_DATA_STORAGE = "feedback-form-state";
 
 const getFormElement = document.querySelector(".feedback-form");
+
 const getEmailInput = document.querySelector("input[name=email]");
 const getMessageInput = document.querySelector("textarea[name=message]");
+const objectDataForm = {};
 
-getFormElement.addEventListener('input', throttle(inputDataStorage, 500));
+getFormElement.addEventListener('input', throttle(fillDataStorage, 500));
 getFormElement.addEventListener('submit', onSubmitForm);
 
 
 console.log('Data from Storage: ', loadFromStorage(KEY_DATA_STORAGE))
-
+//     
 inputDataToForm(loadFromStorage(KEY_DATA_STORAGE))
+
+IsFornInputFilled(getEmailInput, getMessageInput)
 // =============================================================
-function inputDataStorage(event) {
-     /*
-        Відстежуй на формі подію input, 
-        і щоразу записуй у локальне сховище об'єкт з полями email і message, 
-        у яких зберігай поточні значення полів форми */
-    saveInStorage(KEY_DATA_STORAGE, {email: getEmailInput.value, message: getMessageInput.value});
+function fillDataStorage(event) {
+    objectDataForm[event.target.name] = event.target.value;
+    
+    /*
+        Відстежую на формі подію input, 
+        і щоразу записую у локальне сховище об'єкт з полями email і message, 
+        у яких зберігаю поточні значення полів форми */
+    saveInStorage(KEY_DATA_STORAGE, objectDataForm);
 };
 // =============================================================
 function onSubmitForm(event) { 
@@ -29,7 +35,6 @@ function onSubmitForm(event) {
         а також вивожу у консоль об'єкт з полями email, 
         message та їхніми поточними значеннями. */
     event.preventDefault();
-
     console.log({ email: getEmailInput.value, message: getMessageInput.value });
 
     localStorage.clear();
@@ -60,13 +65,21 @@ function loadFromStorage(key) {
 };
 
 function inputDataToForm(data) {
-    // Під час завантаження сторінки перевіряю стан сховища, якщо там є збережені дані
+    // Під час завантаження сторінки перевіряю стан сховища, 
+    // якщо там є збережені дані
     if (!data) { 
             return;
     }
     // заповнюю поля форми даними зі сховища.
     console.log('Data from function: ', data);
-    getEmailInput.value = data.email;
-    getMessageInput.value = data.message;
+    getEmailInput.value = data.email ? data.email: '';
+    getMessageInput.value = data.message ? data.message: '';
+}
 
+function IsFornInputFilled(email, message) { 
+    //  при перезагрузкі сторінки об'єкт очищується, і при повторному заповнені полів об'єкт перезаписується
+    // щоб не втрачати дані з полів, при вигрузкі даних із сховища після перезагрузки сторінки передаю їх як
+    // початкові значення в об'єкт
+    objectDataForm[email.name] = email.value;
+    objectDataForm[message.name] = message.value;
 }
