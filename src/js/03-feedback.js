@@ -12,8 +12,6 @@ const objectDataForm = {};
 getFormElement.addEventListener('input', throttle(fillDataStorage, 500));
 getFormElement.addEventListener('submit', onSubmitForm);
 
-
-console.log('Data from Storage: ', loadFromStorage(KEY_DATA_STORAGE))
 //     
 inputDataToForm(loadFromStorage(KEY_DATA_STORAGE))
 
@@ -21,13 +19,25 @@ IsFornInputFilled(getEmailInput, getMessageInput)
 // =============================================================
 function fillDataStorage(event) {
     objectDataForm[event.target.name] = event.target.value;
-    
     /*
         Відстежую на формі подію input, 
         і щоразу записую у локальне сховище об'єкт з полями email і message, 
         у яких зберігаю поточні значення полів форми */
     saveInStorage(KEY_DATA_STORAGE, objectDataForm);
 };
+
+function checkValidityFields(evt) { 
+
+    if (!getEmailInput.value) {
+        alert('Empty email field!!');
+        return false;
+
+    } else if (!getMessageInput.value) { 
+        alert('Need write some message!');
+        return false;
+    }
+    return true;
+}
 // =============================================================
 function onSubmitForm(event) { 
     /*
@@ -35,7 +45,13 @@ function onSubmitForm(event) {
         а також вивожу у консоль об'єкт з полями email, 
         message та їхніми поточними значеннями. */
     event.preventDefault();
-    console.log({ email: getEmailInput.value, message: getMessageInput.value });
+
+    const checkRes = checkValidityFields(event);
+
+    if (!checkRes) { 
+        return;
+    }
+    console.log('Вивід даних із полів вводу у консоль:', { email: getEmailInput.value, message: getMessageInput.value });
 
     localStorage.clear();
     event.currentTarget.reset();
@@ -71,9 +87,8 @@ function inputDataToForm(data) {
             return;
     }
     // заповнюю поля форми даними зі сховища.
-    console.log('Data from function: ', data);
-    getEmailInput.value = data.email ? data.email: '';
-    getMessageInput.value = data.message ? data.message: '';
+    getEmailInput.value = data.email;
+    getMessageInput.value = data.message;
 }
 
 function IsFornInputFilled(email, message) { 
